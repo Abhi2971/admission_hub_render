@@ -41,7 +41,7 @@ class Config:
     RAZORPAY_WEBHOOK_SECRET = os.getenv('RAZORPAY_WEBHOOK_SECRET')
 
     # CORS
-    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'http://localhost:3000').split(',')
+    CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'https://admission-hub-versal-fbhk.vercel.app').split(',')
 
     # OTP settings
     OTP_EXPIRY_MINUTES = 10

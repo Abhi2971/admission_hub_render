@@ -58,11 +58,14 @@ def create_app(config_name=None):
     app.config.from_object(get_config(config_name))
 
     # Initialize extensions
-    CORS(app, resources={r"/api/*": {"origins": app.config['CORS_ORIGINS']}})
+    cors_origins = app.config['CORS_ORIGINS']
+    cors_str = cors_origins if isinstance(cors_origins, str) else ','.join(cors_origins)
+
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}})
     jwt.init_app(app)
     mail.init_app(app)
     limiter.init_app(app)
-    socketio.init_app(app, cors_allowed_origins=app.config['CORS_ORIGINS'])
+    socketio.init_app(app, cors_allowed_origins=cors_str)
     celery.conf.update(app.config)
 
     # Initialize database connection
