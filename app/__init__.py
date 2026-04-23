@@ -39,7 +39,15 @@ load_dotenv(dotenv_path=env_path)
 
 # Initialize extensions
 mail = Mail()
-socketio = SocketIO(cors_allowed_origins="*", async_mode='threading')
+
+# SocketIO with eventlet async_mode for WebSocket support
+try:
+    import eventlet
+    eventlet.monkey_patch()
+    socketio = SocketIO(cors_allowed_origins="*", async_mode='eventlet')
+except ImportError:
+    socketio = SocketIO(cors_allowed_origins="*", async_mode='threading')
+
 celery = Celery(__name__, broker=os.getenv('REDIS_URL', 'redis://localhost:6379/0'))
 
 def create_app(config_name=None):
@@ -61,11 +69,11 @@ def create_app(config_name=None):
     cors_origins = app.config['CORS_ORIGINS']
     cors_str = cors_origins if isinstance(cors_origins, str) else ','.join(cors_origins)
 
-    CORS(app, resources={r"/api/*": {"origins": cors_origins}})
+    CORS(app, resources={r"/api/*": {"origins": cors_origins}}, supports_credentials=True)
     jwt.init_app(app)
     mail.init_app(app)
     limiter.init_app(app)
-    socketio.init_app(app, cors_allowed_origins=cors_str)
+    socketio.init_app(app)
     celery.conf.update(app.config)
 
     # Initialize database connection
