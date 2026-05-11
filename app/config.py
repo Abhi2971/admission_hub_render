@@ -43,6 +43,9 @@ class Config:
     # CORS
     CORS_ORIGINS = os.getenv('CORS_ORIGINS', 'https://admission-hub-versal-fbhk.vercel.app').split(',')
 
+    # Redis Configuration
+    REDIS_URL = os.getenv('REDIS_URL', 'redis://localhost:6379/0')
+
     # OTP settings
     OTP_EXPIRY_MINUTES = 10
     OTP_RATE_LIMIT = 3  # per hour per email/mobile

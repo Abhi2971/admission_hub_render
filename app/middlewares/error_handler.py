@@ -7,8 +7,9 @@ logger = logging.getLogger(__name__)
 jwt = JWTManager()
 
 def register_error_handlers(app):
-    jwt.init_app(app)
-
+    # JWT is already initialized in app/__init__.py
+    # Just register the error handlers
+    
     @jwt.expired_token_loader
     def expired_token_callback(jwt_header, jwt_payload):
         return jsonify({'error': 'Token has expired', 'code': 'token_expired'}), 401

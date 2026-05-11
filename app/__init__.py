@@ -15,7 +15,7 @@ from celery import Celery
 from app.config import get_config
 from app.database import init_db
 from app.middlewares.error_handler import register_error_handlers, jwt
-from app.middlewares.rate_limiter import limiter
+from app.middlewares.rate_limiter import limiter, init_limiter
 
 # Custom JSON provider using standard json with ObjectId and datetime handling
 class CustomJSONProvider(JSONProvider):
@@ -41,12 +41,7 @@ load_dotenv(dotenv_path=env_path)
 mail = Mail()
 
 # SocketIO with eventlet async_mode for WebSocket support
-try:
-    import eventlet
-    eventlet.monkey_patch()
-    socketio = SocketIO(cors_allowed_origins="*", async_mode='eventlet')
-except ImportError:
-    socketio = SocketIO(cors_allowed_origins="*", async_mode='threading')
+socketio = SocketIO(cors_allowed_origins="*", async_mode='eventlet')
 
 celery = Celery(__name__, broker=os.getenv('REDIS_URL', 'redis://localhost:6379/0'))
 
@@ -72,6 +67,7 @@ def create_app(config_name=None):
     CORS(app, resources={r"/api/*": {"origins": cors_origins}}, supports_credentials=True)
     jwt.init_app(app)
     mail.init_app(app)
+    init_limiter(app)
     limiter.init_app(app)
     socketio.init_app(app)
     celery.conf.update(app.config)
