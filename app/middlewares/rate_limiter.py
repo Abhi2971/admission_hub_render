@@ -1,12 +1,10 @@
 import os
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
-from flask_limiter.strategies import FixedWindowRateLimiter
 
 # Initialize without storage_uri (will be configured per app)
 limiter = Limiter(
     key_func=get_remote_address,
-    strategy=FixedWindowRateLimiter,
     default_limits=["200 per day", "50 per hour"]
 )
 
